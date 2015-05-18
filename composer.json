@@ -1,0 +1,25 @@
+{
+    "name": "zendframework/zendframework",
+    "description": "Zend Framework 2",
+    "type": "library",
+    "keywords": [
+        "framework",
+        "zf2"
+    ],
+    "homepage": "http://framework.zend.com/",
+    "license": "BSD-3-Clause",
+    "require": {
+        "php": ">=5.3.23",
+    },
+    "autoload": {
+        "psr-4": {
+            "Zend\\": "library/Zend/"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": "using PSR-0 for tests, as we have test assets with underscores",
+        "psr-0": {
+            "ZendTest\\": "tests/"
+        }
+    },
+}
