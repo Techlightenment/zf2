@@ -286,8 +286,19 @@ class Memcached extends AbstractBackend implements ExtendedBackend
 				$this->_log("Zend_Cache_Backend_Memcached::clean() : CLEANING_MODE_NOT_MATCHING_TAG is unsupported by the Memcached backend");
 				break;
             case Cache\Cache::CLEANING_MODE_MATCHING_ANY_TAG:
-                $this->_log("Zend_Cache_Backend_Memcached::clean() : CLEANING_MODE_MATCHING_ANY_TAG is unsupported by the Memcached backend");
-                break;
+		   $flag = true;
+		   foreach($tags as $tag) {
+		       $keysToClear = $this->getIdsMatchingTags($tag);
+
+		       foreach($keysToClear as $key) {
+			       if (!$this->_memcache->delete($key)) {
+				       $flag = false;
+			       }
+		       }
+
+		       $this->_memcache->delete(self::TAG_PREFIX . $tag);
+		   }
+		   return $flag;
 			default:
 			 Cache\Cache::throwException('Invalid mode for clean() method');
 				break;
@@ -358,6 +369,9 @@ class Memcached extends AbstractBackend implements ExtendedBackend
     public function getIdsMatchingTags($tags = array())
     {
 		$matches = array();
+		if(!is_array($tags)) {
+			$tags = [$tags];
+		}
         foreach ($tags as $tag) {
 			$res = $this->_memcache->get(self::TAG_PREFIX.$tag);
 			if (is_array($res)) {
