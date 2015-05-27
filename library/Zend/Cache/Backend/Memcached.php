@@ -287,12 +287,12 @@ class Memcached extends AbstractBackend implements ExtendedBackend
 				break;
             case Cache\Cache::CLEANING_MODE_MATCHING_ANY_TAG:
 		   $flag = true;
-		   foreach($tags as $tag) {
+		   foreach ($tags as $tag) {
 		       $keysToClear = $this->getIdsMatchingTags($tag);
 
-		       foreach($keysToClear as $key) {
+		       foreach ($keysToClear as $key) {
 			       if (!$this->_memcache->delete($key)) {
-				       $flag = false;
+				    $flag = false;
 			       }
 		       }
 
@@ -369,7 +369,7 @@ class Memcached extends AbstractBackend implements ExtendedBackend
     public function getIdsMatchingTags($tags = array())
     {
 		$matches = array();
-		if(!is_array($tags)) {
+		if (!is_array($tags)) {
 			$tags = [$tags];
 		}
         foreach ($tags as $tag) {
