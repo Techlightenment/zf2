@@ -315,10 +315,21 @@ class Core implements Frontend
             // no cache available
             return false;
         }
-        $data = zlib_decode($data);
+		if (function_exists("zlib_decode")) {
+			$decoded = @zlib_decode($data);
+			if ($decoded !== false) {
+				$data = $decoded;
+			}
+		}
         if ((!$doNotUnserialize) && $this->_options['automatic_serialization']) {
             // we need to unserialize before sending the result
-            return igbinary_unserialize($data);
+			if (function_exists("igbinary_unserialize")) {
+				$unserialised = igbinary_unserialize($data);
+				if (!is_null($unserialised)) {
+					return $unserialised;
+				}
+			} 
+			return unserialize($data);
         }
         return $data;
     }
@@ -365,7 +376,11 @@ class Core implements Frontend
         self::_validateTagsArray($tags);
         if ($this->_options['automatic_serialization']) {
             // we need to serialize datas before storing them
-            $data = igbinary_serialize($data);
+			if (function_exists("igbinary_serialize")) {
+				$data = igbinary_serialize($data);
+			} else {
+				$data = serialize($data);
+			}
         } else {
             if (!is_string($data)) {
                 Cache::throwException("Datas must be string or set automatic_serialization = true");
@@ -395,7 +410,9 @@ class Core implements Frontend
         if ($this->_options['ignore_user_abort']) {
             $abort = ignore_user_abort(true);
         }
-        $data = zlib_encode($data, ZLIB_ENCODING_GZIP, 9);
+		if (function_exists("zlib_encode")) {
+			$data = zlib_encode($data, ZLIB_ENCODING_GZIP, 9);
+		}
         if (($this->_extendedBackend) && ($this->_backendCapabilities['priority'])) {
             $result = $this->_backend->save($data, $id, $tags, $specificLifetime, $priority);
         } else {
