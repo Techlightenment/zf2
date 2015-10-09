@@ -316,10 +316,12 @@ class Core implements Frontend
             return false;
         }
 		if (function_exists("zlib_decode")) {
-			$decoded = @zlib_decode($data);
-			if ($decoded !== false) {
-				$data = $decoded;
-			}
+			try {
+				$decoded = @zlib_decode($data);
+				if ($decoded !== false) {
+					$data = $decoded;
+				}
+			} catch (\Exception $e) {}
 		}
         if ((!$doNotUnserialize) && $this->_options['automatic_serialization']) {
             // we need to unserialize before sending the result
