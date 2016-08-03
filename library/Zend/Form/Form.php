@@ -2916,6 +2916,7 @@ class Form implements \Iterator, \Countable, \Zend\Validator\Validator
             $return = $this->render();
             return $return;
         } catch (\Exception $e) {
+			\Alchemy\Utils\Logger::errorLog($e, \Alchemy\Utils\Logger::ALERT);
             $message = "Exception caught by form: " . $e->getMessage()
                      . "\nStack Trace:\n" . $e->getTraceAsString();
             trigger_error($message, E_USER_WARNING);

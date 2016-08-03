@@ -220,15 +220,17 @@ class Memcached extends AbstractBackend implements ExtendedBackend
 
         // ZF-8856: using set because add needs a second request if item already exists
         $result = @$this->_memcache->set($id, array($data, time(), $lifetime), $flag, $lifetime);
-
+		$tags = array_unique($tags);
         if (count($tags) > 0) {
 			foreach ($tags as $tag) {
 				$eTag = $this->_memcache->get(self::TAG_PREFIX . $tag);
 				if (!is_array($eTag)) {
 					$eTag = array();
 				}
-				$eTag[] = $id;
-				$this->_memcache->set(self::TAG_PREFIX . $tag, $eTag, 0, self::TAG_LIFETIME);
+				if (!in_array($id, $eTag)) {
+					$eTag[] = $id;
+					$this->_memcache->set(self::TAG_PREFIX . $tag, $eTag, 0, self::TAG_LIFETIME);
+				}
 			}
 		}
 
@@ -266,7 +268,6 @@ class Memcached extends AbstractBackend implements ExtendedBackend
         switch ($mode) {
             case Cache\Cache::CLEANING_MODE_ALL:
                 return $this->_memcache->flush();
-                break;
             case Cache\Cache::CLEANING_MODE_OLD:
                 $this->_log("Zend_Cache_Backend_Memcached::clean() : CLEANING_MODE_OLD is unsupported by the Memcached backend");
                 break;
@@ -372,13 +373,14 @@ class Memcached extends AbstractBackend implements ExtendedBackend
 		if (!is_array($tags)) {
 			$tags = [$tags];
 		}
+		$tags = array_unique($tags);
         foreach ($tags as $tag) {
 			$res = $this->_memcache->get(self::TAG_PREFIX.$tag);
 			if (is_array($res)) {
 				$matches = array_merge($matches, $res);
 			}
 		}
-		return $matches;
+		return array_unique($matches);
     }
 
     /**
