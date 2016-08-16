@@ -280,6 +280,12 @@ class Manager
                 $current['backend']['options'][$key] = $value;
             }
         }
+		if (isset($options['backend']['customBackendNaming'])) {
+			$current['backend']['customBackendNaming'] = $options['backend']['customBackendNaming'];
+		}
+		if (isset($options['frontend']['customFrontendNaming'])) {
+			$current['frontend']['customFrontendNaming'] = $options['frontend']['customFrontendNaming'];
+		}
         return $current;
     }
 }
