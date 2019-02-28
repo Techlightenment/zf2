@@ -32,7 +32,7 @@ namespace Zend\Log\Writer;
  * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Null extends AbstractWriter
+class Noop extends AbstractWriter
 {
     /**
      * Write a message to the log.
@@ -48,7 +48,7 @@ class Null extends AbstractWriter
      * Create a new instance of Zend_Log_Writer_Null
      *
      * @param  array|\Zend\Config\Config $config
-     * @return \Zend\Log\Writer\Null
+     * @return \Zend\Log\Writer\Noop
      */
     static public function factory($config = array())
     {
