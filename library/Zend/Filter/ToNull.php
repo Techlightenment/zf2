@@ -31,7 +31,7 @@ namespace Zend\Filter;
  * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Null extends AbstractFilter
+class ToNull extends AbstractFilter
 {
     const BOOLEAN      = 1;
     const INTEGER      = 2;
