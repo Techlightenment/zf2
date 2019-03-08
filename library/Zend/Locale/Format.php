@@ -318,8 +318,10 @@ class Format
 
         // Get correct signs for this locale
         $symbols = Cldr::getList($options['locale'], 'symbols');
-        $oenc = iconv_get_encoding('internal_encoding');
-        iconv_set_encoding('internal_encoding', 'UTF-8');
+        $oenc = PHP_VERSION_ID < 50600
+            ? iconv_get_encoding('internal_encoding')
+            : ini_get('default_charset');
+        self::_setEncoding('UTF-8');
 
         // Get format
         $format = $options['number_format'];
@@ -354,7 +356,7 @@ class Format
         }
 
         if (iconv_strpos($format, '0') === false) {
-            iconv_set_encoding('internal_encoding', $oenc);
+            self::_setEncoding($oenc);
             throw new Exception\InvalidArgumentException(
               'Wrong format... missing 0'
             );
@@ -481,7 +483,7 @@ class Format
             }
         }
 
-        iconv_set_encoding('internal_encoding', $oenc);
+        self::_setEncoding($oenc);
         return (string) $format;
     }
 
@@ -864,7 +866,7 @@ class Format
         }
 
         if (empty($parse)) {
-            iconv_set_encoding('internal_encoding', $oenc);
+            self::_setEncoding($oenc);
             throw new Exception\InvalidArgumentException("Unknown date format, neither date nor time in '" . $format . "' found");
         }
         ksort($parse);
@@ -883,7 +885,7 @@ class Format
         preg_match_all('/\d+/u', $number, $splitted);
 
         if (count($splitted[0]) == 0) {
-            iconv_set_encoding('internal_encoding', $oenc);
+            self::_setEncoding($oenc);
             throw new Exception\InvalidArgumentException("No date part in '$date' found.");
         }
         if (count($splitted[0]) == 1) {
@@ -988,7 +990,7 @@ class Format
                 if (($position !== false) and ((iconv_strpos($date, $result['day']) === false) or
                                                (isset($result['year']) and (iconv_strpos($date, $result['year']) === false)))) {
                     if ($options['fix_date'] !== true) {
-                        iconv_set_encoding('internal_encoding', $oenc);
+                        self::_setEncoding($oenc);
                         throw new Exception\InvalidArgumentException("Unable to parse date '$date' using '" . $format
                             . "' (false month, $position, $month)");
                     }
@@ -1003,7 +1005,7 @@ class Format
             if (isset($result['day']) and isset($result['year'])) {
                 if ($result['day'] > 31) {
                     if ($options['fix_date'] !== true) {
-                        iconv_set_encoding('internal_encoding', $oenc);
+                        self::_setEncoding($oenc);
                         throw new Exception\InvalidArgumentException("Unable to parse date '$date' using '"
                                                       . $format . "' (d <> y)");
                     }
@@ -1018,7 +1020,7 @@ class Format
             if (isset($result['month']) and isset($result['year'])) {
                 if ($result['month'] > 31) {
                     if ($options['fix_date'] !== true) {
-                        iconv_set_encoding('internal_encoding', $oenc);
+                        self::_setEncoding($oenc);
                         throw new Exception\InvalidArgumentException("Unable to parse date '$date' using '"
                                                       . $format . "' (M <> y)");
                     }
@@ -1033,7 +1035,7 @@ class Format
             if (isset($result['month']) and isset($result['day'])) {
                 if ($result['month'] > 12) {
                     if ($options['fix_date'] !== true || $result['month'] > 31) {
-                        iconv_set_encoding('internal_encoding', $oenc);
+                        self::_setEncoding($oenc);
                         throw new Exception\InvalidArgumentException("Unable to parse date '$date' using '"
                                                       . $format . "' (M <> d)");
                     }
@@ -1059,7 +1061,7 @@ class Format
             }
         }
 
-        iconv_set_encoding('internal_encoding', $oenc);
+        self::_setEncoding($oenc);
         return $result;
     }
 
@@ -1287,4 +1289,13 @@ class Format
     {
         return (@preg_match('/\pL/u', 'a')) ? true : false;
     }
+
+    protected static function _setEncoding($enc)
+    {
+        if (PHP_VERSION_ID < 50600) {
+            iconv_set_encoding('internal_encoding', $enc);
+        } else {
+            ini_set('default_charset', $enc);
+        }
+    }	
 }

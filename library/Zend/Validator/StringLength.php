@@ -191,16 +191,6 @@ class StringLength extends AbstractValidator
      */
     public function setEncoding($encoding = null)
     {
-        if ($encoding !== null) {
-            $orig   = iconv_get_encoding('internal_encoding');
-            $result = iconv_set_encoding('internal_encoding', $encoding);
-            if (!$result) {
-                throw new Exception\InvalidArgumentException('Given encoding not supported on this OS!');
-            }
-
-            iconv_set_encoding('internal_encoding', $orig);
-        }
-
         $this->_encoding = $encoding;
         return $this;
     }

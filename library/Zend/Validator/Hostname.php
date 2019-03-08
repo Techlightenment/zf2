@@ -550,8 +550,8 @@ class Hostname extends AbstractValidator
         if ((count($domainParts) > 1) && (strlen($value) >= 4) && (strlen($value) <= 254)) {
             $status = false;
 
-            $origenc = iconv_get_encoding('internal_encoding');
-            iconv_set_encoding('internal_encoding', 'UTF-8');
+            $origenc = ini_get('default_charset');
+            ini_set('default_charset', 'UTF-8');
             do {
                 // First check TLD
                 $matches = array();
@@ -645,7 +645,7 @@ class Hostname extends AbstractValidator
                 }
             } while (false);
 
-            iconv_set_encoding('internal_encoding', $origenc);
+            ini_set('default_charset', 'UTF-8');
             // If the input passes as an Internet domain name, and domain names are allowed, then the hostname
             // passes validation
             if ($status && ($this->_options['allow'] & self::ALLOW_DNS)) {
